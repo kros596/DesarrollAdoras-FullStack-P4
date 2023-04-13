@@ -1,0 +1,191 @@
+<html>
+<head>
+    <style>
+        /*Diferentes estilos para los controles y contenedores de la página*/
+        #drop_video_src {
+            color: mediumpurple;
+            border: 5px solid mediumpurple;
+            font-weight: bold;
+            width: 70%;
+            height: 80px;
+            cursor: copy;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 2em;
+            text-align: center;
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+            display: flex
+        }
+        
+        .container {
+            justify-content: center;
+            display: inline-flex;
+            width: 100%;
+        }
+        .margin-top {
+            margin-top: 1em;
+        }
+        #aviso {
+            text-align: center;
+            width: 70%;
+            color: indianred;
+            border: 2px solid indianred;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0.5em;
+            display: none;
+            border-radius: 5px;
+        }
+        .button {
+            background-color: lavender;
+            border: solid 0.5px mediumpurple;
+            border-radius:5px;
+            padding:5px;
+            cursor: pointer;
+        }
+
+    </style>
+    <script>
+        const supportedExtensions =["mp4", "mp3", "wav", "wma"]; //Extensiones permitidas para la reproducción del fichero
+
+        function dragover_handler(ev) {
+            console.log("dragOver");
+            // se cambia el fondo del elemento destino para indicar al usuario la zona de arrastre
+            ev.currentTarget.style.background = "lavenderblush";
+            ev.preventDefault();
+        }
+
+        function dragleave_handler(ev) {
+            console.log("dragLeave");
+            //Reinicia el estilo del contenedor de drop
+            ev.currentTarget.style.background = "white";
+            ev.preventDefault();
+        }
+
+        function drop_handler(ev) {
+            //Quita los posibles videos anteriores
+            clearVideo();
+
+            var supported;
+            console.log("File dropped");
+            //Reinicia el estilo del contenedor de drop
+            ev.currentTarget.style.background = "white";
+            //Previene el comportamiento normal del navegador (abrir el archivo)
+            ev.preventDefault();
+
+            //Si no existen ficheros, no se sigue procesando
+            if (ev.dataTransfer.files.length == 0) {
+                return;
+            }
+            //Extrae el fichero
+            var file = ev.dataTransfer.files[0];
+
+            // Extrae la extensión.
+            var fileExt = file.name.split('.').pop();
+            console.log("File extension: " + fileExt);
+            //Valida la extensión
+            supported = validateExtension(fileExt);//Por defecto false, busca si coincide con las extensiones permitidas para devolver true
+            console.log("File supported: " + supported);
+
+
+            if (supported) {
+                var fileUrl = window.URL.createObjectURL(file); //Crea una url del fichero
+                //Todo correcto, muestra el aviso de reproducción, asocia la fuente del video y lo reproduce
+                document.getElementById("aviso").innerText = "Se está reproduciendo el vídeo.";
+                document.getElementById("aviso").style.display = "block";
+                document.getElementById("videoDisplay").src = fileUrl; //Actualiza fuente del video
+                document.getElementById('videoDisplay').play(); //Reproduce el video
+            } else {
+                //No soportado, muestra el aviso
+                document.getElementById("aviso").innerText = "El fichero seleccionado no es un fichero de video aceptado. Por favor, arrastre un archivo de los tipos " + supportedExtensions.toString();
+                document.getElementById("aviso").style.display = "block";
+            }
+            
+        } 
+
+        function validateExtension(extension) {
+            //Función de validación del formato del fichero
+            var supported = false;
+            supportedExtensions.every(function callback(currentExt, index, array) {
+                console.log("File extension: " + extension + " testing " + currentExt);
+                if (extension.toLowerCase() == currentExt.toLowerCase()) {
+                    supported = true;
+                    return false; //Deja de comprobar pues ha encontrado una válida
+                } else {
+                    return true; //Sigue iterando
+                }
+            });
+            return supported;
+        }
+
+        function clearVideo() {
+            //Quita el video asociado y esconde el aviso de reproducción
+            document.getElementById('videoDisplay').pause();
+            document.getElementById('videoDisplay').src = '';
+            document.getElementById("aviso").style.display = "none";
+        }
+
+        function restartVideo() {
+            //Quita el video asociado y esconde el aviso de reproducción
+            document.getElementById('videoDisplay').pause();
+            document.getElementById('videoDisplay').currentTime = 0;
+            document.getElementById('videoDisplay').play();
+        }
+    </script>
+</head>
+<body>
+    <div style="text-align:center">
+        <h1 style="color:rebeccapurple">Práctica 3 FullStack - DesarrollAdoras</h1>
+        <h2 style="color:mediumpurple">API’s de HTML5</h2>
+    </div>
+    <div id="drop_video_src" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" ondragleave="dragleave_handler(event);">
+        <!--área para depositar videos-->
+        Deposita aquí el archivo de video a reproducir.
+    </div>
+
+    <div id="aviso" class="margin-top">
+        <!--Aviso de reproducción o error de formato-->
+        Se está reproduciendo el vídeo.
+    </div>
+
+    <div class="container margin-top">
+        <!--Contenedor del video-->
+        <video id="videoDisplay" preload="none" controls src="" width="50%">
+            El reproductor que estás usando no permite reproducir este contenido.
+        </video>
+    </div>
+    <div class="container margin-top">
+        <div>
+            <!--Botonera-->
+            <button class="button" onclick="document.getElementById('videoDisplay').play();">
+                <!--Botón para reproducir-->
+                Reproducir
+            </button>
+            <button class="button" onclick="document.getElementById('videoDisplay').pause();">
+                <!--Botón para parar-->
+                Pausa
+            </button>
+            <button class="button" onclick="document.getElementById('videoDisplay').volume += 0.1;">
+                <!--Botón para subir volumen-->
+                Subir Volumen
+            </button>
+            <button class="button" onclick="document.getElementById('videoDisplay').volume -= 0.1;">
+                <!--Botón para bajar volumen-->
+                Bajar Volumen
+            </button>
+            <button class="button" onclick="clearVideo()">
+                <!--Botón para quitar la fuente del video-->
+                Quitar Video
+            </button>
+            <button class="button" onclick="restartVideo()">
+                <!--Botón para reiniciar el video-->
+                Reiniciar
+            </button>
+        </div>
+    </div>
+
+</body>
+</html>
+
