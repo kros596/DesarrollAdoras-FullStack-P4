@@ -1,4 +1,4 @@
-<h1>Práctica 6: API's HTML5 - Desarrollo Full-Stack (Nivel 3) ED.2022</h1>
+<h1>Práctica 4: API's HTML5 - Desarrollo Full-Stack (Nivel 3) ED.2022</h1>
 <p>
   En esta práctica se pedía elaborar un documento HTML que permitiese depositar mediante DROP un archivo de vídeo y que éste fuese reproducido,
   haciendo uso de las API's de HTML5 para esto.
